@@ -1,0 +1,33 @@
+version: '2'
+
+services:
+  composer:
+    restart: 'no'
+    image: composer:1.6
+    command: install
+    env_file:
+      - $PWD/service/.env
+    volumes:
+      - $PWD/service:/app
+
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: service-db
+      MYSQL_USER: service-user
+      MYSQL_PASSWORD: my-secret-pw
+      MYSQL_ROOT_PASSWORD: my-secret-pw
+    restart: always
+
+  service:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file:
+    - $PWD/service/.env
+    depends_on:
+      - mysql
+    ports:
+      - "80:80"
+    volumes:
+      - ./service:/service
